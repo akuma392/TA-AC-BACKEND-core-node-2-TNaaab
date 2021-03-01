@@ -14,19 +14,14 @@ function handleRequest(req, res) {
   req.on('end', () => {
     // res.writeHead(201, { 'content-type': 'application/json' });
 
-    if (req.method == 'POST' && req.url == '/') {
-      res.writeHead(201, { 'content-type': 'application/json' });
-      var parsedData = qs.parse(store);
-      res.end(JSON.stringify(parsedData));
-    } else if (req.method == 'GET' && req.url == '/form') {
+    if (req.method == 'GET' && req.url == '/form') {
       res.writeHead(201, { 'content-type': 'text/html' });
       fs.createReadStream('./form.html').pipe(res);
-    }
-    if (dataFormat == 'application/x-www-form-urlencoded') {
+    } else if (req.method == 'POST' && req.url == '/form') {
       var parsedData = qs.parse(store);
       res.writeHead(201, { 'content-type': 'text/html' });
       res.write(
-        ` <h1>${parsedData.Name}</h1><p>${parsedData.email}</p> <p>${parsedData.age}</p>`
+        ` <h1>${parsedData.name}</h1><p>${parsedData.email}</p> <p>${parsedData.age}</p>`
       );
       res.end();
     }
