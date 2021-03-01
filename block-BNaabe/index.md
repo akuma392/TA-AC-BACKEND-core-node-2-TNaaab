@@ -76,6 +76,36 @@ Q. Follow above steps with form data from postman instead of json data.
 
 - once data has been captured, send only captain's name in response.
 
+```js
+var http = require('http');
+var qs = require('querystring');
+var url = require('url');
+function handleRequest(req, res) {
+  var dataFormat = req.headers[`content-type`];
+
+  //   console.log(req.headers, dataFormat);
+
+  var store = '';
+  req.on('data', (chunk) => {
+    store += chunk;
+  });
+  req.on('end', () => {
+    // res.writeHead(201, { 'content-type': 'application/json' });
+
+    if (req.method == 'POST' && req.url == '/') {
+      // res.writeHead(201, { 'content-type': 'application/json' });
+      var parsedData = qs.parse(store);
+      res.end(JSON.stringify(parsedData));
+    }
+  });
+}
+
+let server = http.createServer(handleRequest);
+server.listen(7080, () => {
+  console.log('Server is listening on port 7080');
+});
+```
+
 Q. Create server which can handle both json/form data without specifying which format of data is being received.
 
 - add listener on port 9000
@@ -143,13 +173,14 @@ function handleRequest(req, res) {
     // res.writeHead(201, { 'content-type': 'application/json' });
 
     if (dataFormat == 'application/json') {
+      var parsed = JSON.parse(store);
       res.writeHead(201, { 'content-type': 'text/html' });
-      res.write(` <h1>${store.name}</h1><h2>${store.email}</h2>`);
-      res.end();
+
+      res.end(`<h1>${parsed.name}</h1><h2>${parsed.email}</h2>`);
     }
     if (dataFormat == 'application/x-www-form-urlencoded') {
-      res.writeHead(201, { 'content-type': 'text/html' });
       var parsedData = qs.parse(store);
+      res.writeHead(201, { 'content-type': 'text/html' });
       res.write(` <h1>${store.name}</h1><h2>${store.email}</h2>`);
       res.end();
     }
@@ -170,3 +201,40 @@ Q. Follow above question with form data containing fields i.e name and email.
 #### Note:-
 
 Make sure to convert objects into strings using `JSON.stringify` before passing the data through response.
+
+```js
+var http = require('http');
+var qs = require('querystring');
+var url = require('url');
+function handleRequest(req, res) {
+  var dataFormat = req.headers[`content-type`];
+
+  //   console.log(req.headers, dataFormat);
+  console.log(dataFormat);
+  var store = '';
+  req.on('data', (chunk) => {
+    store += chunk;
+  });
+  req.on('end', () => {
+    // res.writeHead(201, { 'content-type': 'application/json' });
+
+    if (dataFormat == 'application/json') {
+      var parsed = JSON.parse(store);
+      res.writeHead(201, { 'content-type': 'text/html' });
+
+      res.end(`<h1>${parsed.name}</h1><h2>${parsed.email}</h2>`);
+    }
+    if (dataFormat == 'application/x-www-form-urlencoded') {
+      var parsedData = qs.parse(store);
+      res.writeHead(201, { 'content-type': 'text/html' });
+      res.write(` <h1>${parsedData.Name}</h1><h2>${parsedData.email}</h2>`);
+      res.end();
+    }
+  });
+}
+
+let server = http.createServer(handleRequest);
+server.listen(7080, () => {
+  console.log('Server is listening on port 7080');
+});
+```

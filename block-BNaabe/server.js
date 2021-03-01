@@ -13,16 +13,10 @@ function handleRequest(req, res) {
   req.on('end', () => {
     // res.writeHead(201, { 'content-type': 'application/json' });
 
-    if (dataFormat == 'application/json') {
-      res.writeHead(201, { 'content-type': 'text/html' });
-      res.write(` <h1>${store.name}</h1><h2>${store.email}</h2>`);
-      res.end();
-    }
-    if (dataFormat == 'application/x-www-form-urlencoded') {
-      res.writeHead(201, { 'content-type': 'text/html' });
+    if (req.method == 'POST' && req.url == '/') {
+      res.writeHead(201, { 'content-type': 'application/json' });
       var parsedData = qs.parse(store);
-      res.write(` <h1>${store.name}</h1><h2>${store.email}</h2>`);
-      res.end();
+      res.end(JSON.stringify(parsedData));
     }
   });
 }
